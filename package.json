@@ -1,6 +1,6 @@
 {
   "name": "com.alephvault.unity.remotestorage",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "displayName": "Aleph Vault - Unity - RemoteStorage",
   "description": "A set of interfaces, and a default implementation (which is to an HTTP server), to provide read-write access to a remote storage.",
   "unity": "2018.1",
