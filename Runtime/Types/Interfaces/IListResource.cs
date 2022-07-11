@@ -86,7 +86,7 @@ namespace AlephVault.Unity.RemoteStorage
                 /// <param name="method">The method to query</param>
                 /// <param name="args">The arguments to pass</param>
                 /// <returns>A result of the operation. The id type is, actually, typically ignored</returns>
-                public Task<Result<JObject, IDType>> View(string method, Dictionary<string, string> args);
+                public Task<Result<JObject, IDType>> ViewToJson(string method, Dictionary<string, string> args);
 
                 /// <summary>
                 ///   Runs an operation method from the whole list.
@@ -96,7 +96,7 @@ namespace AlephVault.Unity.RemoteStorage
                 /// <param name="args">The arguments to pass</param>
                 /// <param name="body">The body to send</param>
                 /// <returns>A result of the operation. The id type is, actually, typically ignored</returns>
-                public Task<Result<JObject, IDType>> Operation<E>(string method, Dictionary<string, string> args,
+                public Task<Result<JObject, IDType>> OperationToJson<E>(string method, Dictionary<string, string> args,
                     E body);
 
                 /// <summary>
@@ -105,7 +105,7 @@ namespace AlephVault.Unity.RemoteStorage
                 /// <param name="method">The method to run</param>
                 /// <param name="args">The arguments to pass</param>
                 /// <returns>A result of the operation. The id type is, actually, typically ignored</returns>
-                public Task<Result<JObject, IDType>> Operation(string method, Dictionary<string, string> args);
+                public Task<Result<JObject, IDType>> OperationToJson(string method, Dictionary<string, string> args);
 
                 /// <summary>
                 ///   Queries a view method from the whole list
@@ -115,7 +115,7 @@ namespace AlephVault.Unity.RemoteStorage
                 /// <param name="method">The method to query</param>
                 /// <param name="args">The arguments to pass</param>
                 /// <returns>A result of the operation. The id type is, actually, typically ignored</returns>
-                public Task<Result<JObject, IDType>> ItemView(IDType id, string method,
+                public Task<Result<JObject, IDType>> ItemViewToJson(IDType id, string method,
                     Dictionary<string, string> args);
 
                 /// <summary>
@@ -128,7 +128,7 @@ namespace AlephVault.Unity.RemoteStorage
                 /// <param name="args">The arguments to pass</param>
                 /// <param name="body">The body to send</param>
                 /// <returns>A result of the operation. The id type is, actually, typically ignored</returns>
-                public Task<Result<JObject, IDType>> ItemOperation<E>(IDType id,
+                public Task<Result<JObject, IDType>> ItemOperationToJson<E>(IDType id,
                     string method, Dictionary<string, string> args, E body);
 
                 /// <summary>
@@ -139,7 +139,141 @@ namespace AlephVault.Unity.RemoteStorage
                 /// <param name="method">The method to run</param>
                 /// <param name="args">The arguments to pass</param>
                 /// <returns>A result of the operation. The id type is, actually, typically ignored</returns>
-                public Task<Result<JObject, IDType>> ItemOperation(IDType id, string method,
+                public Task<Result<JObject, IDType>> ItemOperationToJson(IDType id, string method,
+                    Dictionary<string, string> args);
+                
+                /// <summary>
+                ///   Queries a view method from the whole list.
+                /// </summary>
+                /// <param name="method">The method to query</param>
+                /// <param name="args">The arguments to pass</param>
+                /// <returns>A result of the operation. The id type is, actually, typically ignored</returns>
+                public Task<Result<JArray, IDType>> ViewToJsonArray(string method, Dictionary<string, string> args);
+
+                /// <summary>
+                ///   Runs an operation method from the whole list.
+                ///   It also provides a custom body.
+                /// </summary>
+                /// <param name="method">The method to run</param>
+                /// <param name="args">The arguments to pass</param>
+                /// <param name="body">The body to send</param>
+                /// <returns>A result of the operation. The id type is, actually, typically ignored</returns>
+                public Task<Result<JArray, IDType>> OperationToJsonArray<E>(string method, Dictionary<string, string> args,
+                    E body);
+
+                /// <summary>
+                ///   Runs an operation method from the whole list.
+                /// </summary>
+                /// <param name="method">The method to run</param>
+                /// <param name="args">The arguments to pass</param>
+                /// <returns>A result of the operation. The id type is, actually, typically ignored</returns>
+                public Task<Result<JArray, IDType>> OperationToJsonArray(string method, Dictionary<string, string> args);
+
+                /// <summary>
+                ///   Queries a view method from the whole list
+                ///   for a particular item.
+                /// </summary>
+                /// <param name="id">The intended item in the list</param>
+                /// <param name="method">The method to query</param>
+                /// <param name="args">The arguments to pass</param>
+                /// <returns>A result of the operation. The id type is, actually, typically ignored</returns>
+                public Task<Result<JArray, IDType>> ItemViewToJsonArray(IDType id, string method,
+                    Dictionary<string, string> args);
+
+                /// <summary>
+                ///   Runs an operation method from the whole list
+                ///   for a particular item. It also provides a custom
+                ///   body.
+                /// </summary>
+                /// <param name="id">The intended item in the list</param>
+                /// <param name="method">The method to run</param>
+                /// <param name="args">The arguments to pass</param>
+                /// <param name="body">The body to send</param>
+                /// <returns>A result of the operation. The id type is, actually, typically ignored</returns>
+                public Task<Result<JArray, IDType>> ItemOperationToJsonArray<E>(IDType id,
+                    string method, Dictionary<string, string> args, E body);
+
+                /// <summary>
+                ///   Runs an operation method from the whole list
+                ///   for a particular item.
+                /// </summary>
+                /// <param name="id">The intended item in the list</param>
+                /// <param name="method">The method to run</param>
+                /// <param name="args">The arguments to pass</param>
+                /// <returns>A result of the operation. The id type is, actually, typically ignored</returns>
+                public Task<Result<JArray, IDType>> ItemOperationToJsonArray(IDType id, string method,
+                    Dictionary<string, string> args);
+                
+                /// <summary>
+                ///   Queries a view method from the whole list.
+                /// </summary>
+                /// <param name="method">The method to query</param>
+                /// <param name="args">The arguments to pass</param>
+                /// <typeparam name="ResponseType">The response type</typeparam>
+                /// <returns>A result of the operation. The id type is, actually, typically ignored</returns>
+                public Task<Result<ResponseType, IDType>> ViewTo<ResponseType>(string method,
+                    Dictionary<string, string> args);
+
+                /// <summary>
+                ///   Runs an operation method from the whole list.
+                ///   It also provides a custom body.
+                /// </summary>
+                /// <param name="method">The method to run</param>
+                /// <param name="args">The arguments to pass</param>
+                /// <param name="body">The body to send</param>
+                /// <typeparam name="E">The body type</typeparam>
+                /// <typeparam name="ResponseType">The response type</typeparam>
+                /// <returns>A result of the operation. The id type is, actually, typically ignored</returns>
+                public Task<Result<ResponseType, IDType>> OperationTo<E, ResponseType>(string method,
+                    Dictionary<string, string> args, E body);
+
+                /// <summary>
+                ///   Runs an operation method from the whole list.
+                /// </summary>
+                /// <param name="method">The method to run</param>
+                /// <param name="args">The arguments to pass</param>
+                /// <typeparam name="ResponseType">The response type</typeparam>
+                /// <returns>A result of the operation. The id type is, actually, typically ignored</returns>
+                public Task<Result<ResponseType, IDType>> OperationTo<ResponseType>(string method,
+                    Dictionary<string, string> args);
+
+                /// <summary>
+                ///   Queries a view method from the whole list
+                ///   for a particular item.
+                /// </summary>
+                /// <param name="id">The intended item in the list</param>
+                /// <param name="method">The method to query</param>
+                /// <param name="args">The arguments to pass</param>
+                /// <typeparam name="ResponseType">The response type</typeparam>
+                /// <returns>A result of the operation. The id type is, actually, typically ignored</returns>
+                public Task<Result<ResponseType, IDType>> ItemViewTo<ResponseType>(IDType id,string method,
+                    Dictionary<string, string> args);
+
+                /// <summary>
+                ///   Runs an operation method from the whole list
+                ///   for a particular item. It also provides a custom
+                ///   body.
+                /// </summary>
+                /// <param name="id">The intended item in the list</param>
+                /// <param name="method">The method to run</param>
+                /// <param name="args">The arguments to pass</param>
+                /// <param name="body">The body to send</param>
+                /// <typeparam name="E">The body type</typeparam>
+                /// <typeparam name="ResponseType">The response type</typeparam>
+                /// <returns>A result of the operation. The id type is, actually, typically ignored</returns>
+                public Task<Result<ResponseType, IDType>> ItemOperationTo<E, ResponseType>(IDType id,
+                    string method, Dictionary<string, string> args, E body);
+
+                /// <summary>
+                ///   Runs an operation method from the whole list
+                ///   for a particular item.
+                /// </summary>
+                /// <param name="id">The intended item in the list</param>
+                /// <param name="method">The method to run</param>
+                /// <param name="args">The arguments to pass</param>
+                /// <typeparam name="ResponseType">The response type</typeparam>
+                /// <returns>A result of the operation. The id type is, actually, typically ignored</returns>
+                public Task<Result<ResponseType, IDType>> ItemOperationTo<ResponseType>(IDType id, string method,
                     Dictionary<string, string> args);
             }
         }

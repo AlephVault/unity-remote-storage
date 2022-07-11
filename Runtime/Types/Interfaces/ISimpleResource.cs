@@ -68,8 +68,8 @@ namespace AlephVault.Unity.RemoteStorage
                 /// </summary>
                 /// <param name="method">The method to query</param>
                 /// <param name="args">The arguments to pass</param>
-                /// <returns>A result of the operation. The id type is, actually, typically ignored</returns>
-                public Task<Result<JObject, IDType>> View(string method, Dictionary<string, string> args);
+                /// <returns>A result of the view</returns>
+                public Task<Result<JObject, IDType>> ViewToJson(string method, Dictionary<string, string> args);
 
                 /// <summary>
                 ///   Runs an operation method from the only item in
@@ -78,8 +78,9 @@ namespace AlephVault.Unity.RemoteStorage
                 /// <param name="method">The method to run</param>
                 /// <param name="args">The arguments to pass</param>
                 /// <param name="body">The body to send</param>
-                /// <returns>A result of the operation. The id type is, actually, typically ignored</returns>
-                public Task<Result<JObject, IDType>> Operation<E>(string method, Dictionary<string, string> args,
+                /// <typeparam name="E">The body type</typeparam>
+                /// <returns>A result of the operation</returns>
+                public Task<Result<JObject, IDType>> OperationToJson<E>(string method, Dictionary<string, string> args,
                     E body);
 
                 /// <summary>
@@ -88,8 +89,71 @@ namespace AlephVault.Unity.RemoteStorage
                 /// </summary>
                 /// <param name="method">The method to run</param>
                 /// <param name="args">The arguments to pass</param>
-                /// <returns>A result of the operation. The id type is, actually, typically ignored</returns>
-                public Task<Result<JObject, IDType>> Operation(string method, Dictionary<string, string> args);
+                /// <returns>A result of the operation</returns>
+                public Task<Result<JObject, IDType>> OperationToJson(string method, Dictionary<string, string> args);
+                
+                /// <summary>
+                ///   Queries a view method from the only item in the
+                ///   collection.
+                /// </summary>
+                /// <param name="method">The method to query</param>
+                /// <param name="args">The arguments to pass</param>
+                /// <returns>A result of the view</returns>
+                public Task<Result<JArray, IDType>> ViewToJsonArray(string method, Dictionary<string, string> args);
+
+                /// <summary>
+                ///   Runs an operation method from the only item in
+                ///   the collection. It also provides a custom body.
+                /// </summary>
+                /// <param name="method">The method to run</param>
+                /// <param name="args">The arguments to pass</param>
+                /// <param name="body">The body to send</param>
+                /// <typeparam name="E">The body type</typeparam>
+                /// <returns>A result of the operation</returns>
+                public Task<Result<JArray, IDType>> OperationToJsonArray<E>(string method, Dictionary<string, string> args,
+                    E body);
+
+                /// <summary>
+                ///   Runs an operation method from the only item in
+                ///   the collection.
+                /// </summary>
+                /// <param name="method">The method to run</param>
+                /// <param name="args">The arguments to pass</param>
+                /// <returns>A result of the operation</returns>
+                public Task<Result<JArray, IDType>> OperationToJsonArray(string method, Dictionary<string, string> args);
+                
+                /// <summary>
+                ///   Queries a view method from the only item in the
+                ///   collection.
+                /// </summary>
+                /// <param name="method">The method to query</param>
+                /// <param name="args">The arguments to pass</param>
+                /// <typeparam name="ResponseType">The response type</typeparam>
+                /// <returns>A result of the view</returns>
+                public Task<Result<ResponseType, IDType>> ViewTo<ResponseType>(string method, Dictionary<string, string> args);
+
+                /// <summary>
+                ///   Runs an operation method from the only item in
+                ///   the collection. It also provides a custom body.
+                /// </summary>
+                /// <param name="method">The method to run</param>
+                /// <param name="args">The arguments to pass</param>
+                /// <param name="body">The body to send</param>
+                /// <typeparam name="ResponseType">The response type</typeparam>
+                /// <typeparam name="E">The body type</typeparam>
+                /// <returns>A result of the operation</returns>
+                public Task<Result<ResponseType, IDType>> OperationTo<E, ResponseType>(string method, Dictionary<string, string> args,
+                    E body);
+
+                /// <summary>
+                ///   Runs an operation method from the only item in
+                ///   the collection.
+                /// </summary>
+                /// <param name="method">The method to run</param>
+                /// <param name="args">The arguments to pass</param>
+                /// <typeparam name="ResponseType">The response type</typeparam>
+                /// <returns>A result of the operation</returns>
+                public Task<Result<ResponseType, IDType>> OperationTo<ResponseType>(string method, Dictionary<string, string> args);
             }
         }
     }

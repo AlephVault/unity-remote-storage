@@ -6,6 +6,7 @@ using AlephVault.Unity.RemoteStorage.Types.Results;
 using AlephVault.Unity.Support.Types.Async;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using PlasticPipe.Server;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -62,8 +63,27 @@ namespace AlephVault.Unity.RemoteStorage.StandardHttp
                 }
             }
 
-            // Deserializes content using Newtonsoft.Json.
-            private static ElementType Deserialize<ElementType>(byte[] data, ResultCode errorCode = ResultCode.FormatError)
+            /// <summary>
+            ///   Deserialize an object from a JSON byte array.
+            /// </summary>
+            /// <param name="data">The bytes to deserialize from</param>
+            /// <typeparam name="ElementType">The element type</typeparam>
+            /// <returns>The deserialized element</returns>
+            /// <exception cref="Exception">A JSON deserialization error occurred</exception>
+            private static ElementType Deserialize<ElementType>(byte[] data)
+            {
+                return Deserialize<ElementType>(data, ResultCode.FormatError);
+            }
+
+            /// <summary>
+            ///   Deserialize an object from a JSON byte array.
+            /// </summary>
+            /// <param name="data">The bytes to deserialize from</param>
+            /// <param name="resultCode">The error to raise</param>
+            /// <typeparam name="ElementType">The element type</typeparam>
+            /// <returns>The deserialized element</returns>
+            /// <exception cref="Exception">A JSON deserialization error occurred</exception>
+            private static ElementType Deserialize<ElementType>(byte[] data, ResultCode resultCode)
             {
                 try
                 {
@@ -73,12 +93,17 @@ namespace AlephVault.Unity.RemoteStorage.StandardHttp
                 }
                 catch (System.Exception)
                 {
-                    throw new Exception(errorCode);
+                    throw new Exception(resultCode);
                 }
             }
 
-            // Deserializes content using Newtonsoft.Json into JObject.
-            private static JObject DeserializeArbitrary(byte[] data, ResultCode errorCode = ResultCode.FormatError)
+            /// <summary>
+            ///   Deserialize a JObject from a JSON byte array.
+            /// </summary>
+            /// <param name="data">The bytes to deserialize from</param>
+            /// <returns>The deserialized element</returns>
+            /// <exception cref="Exception">A JSON deserialization error occurred</exception>
+            private static JObject DeserializeJObject(byte[] data)
             {
                 try
                 {
@@ -88,10 +113,30 @@ namespace AlephVault.Unity.RemoteStorage.StandardHttp
                 }
                 catch (System.Exception e)
                 {
-                    throw new Exception(errorCode);
+                    throw new Exception(ResultCode.FormatError);
                 }
             }
-            
+
+            /// <summary>
+            ///   Deserialize a JArray from a JSON byte array.
+            /// </summary>
+            /// <param name="data">The bytes to deserialize from</param>
+            /// <returns>The deserialized element</returns>
+            /// <exception cref="Exception">A JSON deserialization error occurred</exception>
+            private static JArray DeserializeJArray(byte[] data)
+            {
+                try
+                {
+                    MemoryStream stream = new MemoryStream(data);
+                    StreamReader reader = new StreamReader(stream);
+                    return JArray.Parse(reader.ReadToEnd());
+                }
+                catch (System.Exception e)
+                {
+                    throw new Exception(ResultCode.FormatError);
+                }
+            }
+
             // Serializes content using Newtonsoft.Json.
             private static byte[] Serialize<ElementType>(ElementType data, ResultCode errorCode = ResultCode.FormatError)
             {
@@ -107,25 +152,6 @@ namespace AlephVault.Unity.RemoteStorage.StandardHttp
                     return stream.ToArray();
                 }
                 catch (System.Exception e)
-                {
-                    throw new Exception(errorCode);
-                }
-            }
-            
-            // Serializes a JObject content to byte array.
-            private static byte[] SerializeArbitrary(JObject data, ResultCode errorCode = ResultCode.FormatError)
-            {
-                try
-                {
-                    MemoryStream stream = new MemoryStream();
-                    using (StreamWriter streamWriter = new StreamWriter(stream))
-                    {
-                        streamWriter.Write(data.ToString());
-                    }
-
-                    return stream.ToArray();
-                }
-                catch (System.Exception)
                 {
                     throw new Exception(errorCode);
                 }

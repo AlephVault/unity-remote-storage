@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -241,10 +242,13 @@ namespace AlephVault.Unity.RemoteStorage.StandardHttp
             /// <param name="endpoint">The whole endpoint url</param>
             /// <param name="requestArgs">The arguments for the query string</param>
             /// <param name="authorization">The authorization to use</param>
+            /// <param name="deserializer">A function used to deserialize</param>
             /// <typeparam name="AuthType">The authentication type</typeparam>
-            public static async Task<JObject> View<AuthType>(string endpoint, AuthType authorization,
-                Dictionary<string, string> requestArgs) where AuthType : Authorization
-            {
+            /// <typeparam name="ResponseType">The type of the response</typeparam>
+            private static async Task<ResponseType> DoView<AuthType, ResponseType>(
+                string endpoint, AuthType authorization, Dictionary<string, string> requestArgs,
+                Func<byte[], ResponseType> deserializer
+            ) where AuthType : Authorization {
                 string url = endpoint.Split('?')[0];
                 if (requestArgs != null && requestArgs.Count > 0)
                 {
@@ -269,7 +273,8 @@ namespace AlephVault.Unity.RemoteStorage.StandardHttp
                 FailOnFormatError(status);
                 FailOnServerError(status);
                 FailOnOtherErrors(status);
-                return DeserializeArbitrary(request.downloadHandler.data);
+                // return DeserializeJObject(request.downloadHandler.data);
+                return deserializer(request.downloadHandler.data);
             }
 
             /// <summary>
@@ -280,11 +285,14 @@ namespace AlephVault.Unity.RemoteStorage.StandardHttp
             /// <param name="requestArgs">The arguments for the query string</param>
             /// <param name="body">The body to use</param>
             /// <param name="authorization">The authorization to use</param>
+            /// <param name="deserializer">A function used to deserialize</param>
+            /// <typeparam name="ElementType">The type of the body</typeparam>
             /// <typeparam name="AuthType">The authentication type</typeparam>
-            public static async Task<JObject> Operation<ElementType, AuthType>(string endpoint,
-                AuthType authorization, Dictionary<string, string> requestArgs, ElementType body)
-                where AuthType : Authorization
-            {
+            /// <typeparam name="ResponseType">The type of the response</typeparam>
+            private static async Task<ResponseType> DoOperation<ElementType, AuthType, ResponseType>(
+                string endpoint, AuthType authorization, Dictionary<string, string> requestArgs,
+                ElementType body, Func<byte[], ResponseType> deserializer
+            ) where AuthType : Authorization {
                 string url = endpoint.Split('?')[0];
                 if (requestArgs != null && requestArgs.Count > 0)
                 {
@@ -314,7 +322,141 @@ namespace AlephVault.Unity.RemoteStorage.StandardHttp
                 FailOnFormatError(status);
                 FailOnServerError(status);
                 FailOnOtherErrors(status);
-                return DeserializeArbitrary(request.downloadHandler.data);
+                return deserializer(request.downloadHandler.data);
+            }
+
+            /// <summary>
+            ///   Runs a particular operation (from an item or from a simple
+            ///   resource).
+            /// </summary>
+            /// <param name="endpoint">The whole endpoint url</param>
+            /// <param name="requestArgs">The arguments for the query string</param>
+            /// <param name="authorization">The authorization to use</param>
+            /// <param name="deserializer">A function used to deserialize</param>
+            /// <typeparam name="AuthType">The authentication type</typeparam>
+            /// <typeparam name="ResponseType">The type of the response</typeparam>
+            private static async Task<ResponseType> DoOperation<AuthType, ResponseType>(
+                string endpoint, AuthType authorization, Dictionary<string, string> requestArgs,
+                Func<byte[], ResponseType> deserializer
+            ) where AuthType : Authorization {
+                return await DoOperation<object, AuthType, ResponseType>(
+                    endpoint, authorization, requestArgs, null, deserializer
+                );
+            }
+
+            /// <summary>
+            ///   Hits a particular view.
+            /// </summary>
+            /// <param name="endpoint">The whole endpoint url</param>
+            /// <param name="authorization">The authorization to use</param>
+            /// <param name="requestArgs">The arguments for the query string</param>
+            /// <typeparam name="AuthType">The authentication type</typeparam>
+            /// <returns>The view result</returns>
+            public static Task<JObject> ViewToJson<AuthType>(
+                string endpoint, AuthType authorization, Dictionary<string, string> requestArgs
+            ) where AuthType : Authorization
+            {
+                return DoView(endpoint, authorization, requestArgs, DeserializeJObject);
+            }
+            
+            /// <summary>
+            ///   Hits a particular view.
+            /// </summary>
+            /// <param name="endpoint">The whole endpoint url</param>
+            /// <param name="authorization">The authorization to use</param>
+            /// <param name="requestArgs">The arguments for the query string</param>
+            /// <typeparam name="AuthType">The authentication type</typeparam>
+            /// <returns>The view result</returns>
+            public static Task<JArray> ViewToJsonArray<AuthType>(
+                string endpoint, AuthType authorization, Dictionary<string, string> requestArgs
+            ) where AuthType : Authorization
+            {
+                return DoView(endpoint, authorization, requestArgs, DeserializeJArray);
+            }
+            
+            /// <summary>
+            ///   Hits a particular view.
+            /// </summary>
+            /// <param name="endpoint">The whole endpoint url</param>
+            /// <param name="authorization">The authorization to use</param>
+            /// <param name="requestArgs">The arguments for the query string</param>
+            /// <typeparam name="AuthType">The authentication type</typeparam>
+            /// <returns>The view result</returns>
+            public static Task<ResponseType> ViewTo<AuthType, ResponseType>(
+                string endpoint, AuthType authorization, Dictionary<string, string> requestArgs
+            ) where AuthType : Authorization
+            {
+                return DoView(endpoint, authorization, requestArgs, Deserialize<ResponseType>);
+            }
+
+            /// <summary>
+            ///   Runs a particular operation (from an item or from a simple
+            ///   resource).
+            /// </summary>
+            /// <param name="endpoint">The whole endpoint url</param>
+            /// <param name="requestArgs">The arguments for the query string</param>
+            /// <param name="authorization">The authorization to use</param>
+            /// <param name="body">The body to use</param>
+            /// <typeparam name="AuthType">The authentication type</typeparam>
+            /// <typeparam name="ElementType">The type of the input body</typeparam>
+            /// <returns>The operation result</returns>
+            public static Task<JObject> OperationToJson<ElementType, AuthType>(
+                string endpoint, AuthType authorization, Dictionary<string, string> requestArgs,
+                ElementType body
+            ) where AuthType : Authorization {
+                return DoOperation(endpoint, authorization, requestArgs, body, DeserializeJObject);
+            }
+
+            /// <summary>
+            ///   Runs a particular operation (from an item or from a simple
+            ///   resource).
+            /// </summary>
+            /// <param name="endpoint">The whole endpoint url</param>
+            /// <param name="requestArgs">The arguments for the query string</param>
+            /// <param name="authorization">The authorization to use</param>
+            /// <param name="body">The body to use</param>
+            /// <typeparam name="AuthType">The authentication type</typeparam>
+            /// <typeparam name="ElementType">The type of the input body</typeparam>
+            /// <returns>The operation result</returns>
+            public static Task<JArray> OperationToJsonArray<ElementType, AuthType>(
+                string endpoint, AuthType authorization, Dictionary<string, string> requestArgs,
+                ElementType body
+            ) where AuthType : Authorization {
+                return DoOperation(endpoint, authorization, requestArgs, body, DeserializeJArray);
+            }
+            
+            /// <summary>
+            ///   Runs a particular operation (from an item or from a simple
+            ///   resource).
+            /// </summary>
+            /// <param name="endpoint">The whole endpoint url</param>
+            /// <param name="requestArgs">The arguments for the query string</param>
+            /// <param name="authorization">The authorization to use</param>
+            /// <param name="body">The body to use</param>
+            /// <typeparam name="AuthType">The authentication type</typeparam>
+            /// <typeparam name="ElementType">The type of the input body</typeparam>
+            /// <typeparam name="ResponseType">The type of the response</typeparam>
+            /// <returns>The operation result</returns>
+            public static Task<ResponseType> OperationTo<ElementType, AuthType, ResponseType>(
+                string endpoint, AuthType authorization, Dictionary<string, string> requestArgs,
+                ElementType body
+            ) where AuthType : Authorization {
+                return DoOperation(endpoint, authorization, requestArgs, body, Deserialize<ResponseType>);
+            }
+            
+            /// <summary>
+            ///   Runs a particular operation (from an item or from a simple
+            ///   resource).
+            /// </summary>
+            /// <param name="endpoint">The whole endpoint url</param>
+            /// <param name="requestArgs">The arguments for the query string</param>
+            /// <param name="authorization">The authorization to use</param>
+            /// <typeparam name="AuthType">The authentication type</typeparam>
+            /// <returns>The operation result</returns>
+            public static Task<JObject> OperationToJson<AuthType>(
+                string endpoint, AuthType authorization, Dictionary<string, string> requestArgs
+                        ) where AuthType : Authorization {
+                return DoOperation(endpoint, authorization, requestArgs, DeserializeJObject);
             }
 
             /// <summary>
@@ -325,10 +467,27 @@ namespace AlephVault.Unity.RemoteStorage.StandardHttp
             /// <param name="requestArgs">The arguments for the query string</param>
             /// <param name="authorization">The authorization to use</param>
             /// <typeparam name="AuthType">The authentication type</typeparam>
-            public static async Task<JObject> Operation<AuthType>(string endpoint, AuthType authorization,
-                Dictionary<string, string> requestArgs) where AuthType : Authorization
-            {
-                return await Operation<object, AuthType>(endpoint, authorization, requestArgs, null);
+            /// <returns>The operation result</returns>
+            public static Task<JArray> OperationToJsonArray<AuthType>(
+                string endpoint, AuthType authorization, Dictionary<string, string> requestArgs
+            ) where AuthType : Authorization {
+                return DoOperation(endpoint, authorization, requestArgs, DeserializeJArray);
+            }
+            
+            /// <summary>
+            ///   Runs a particular operation (from an item or from a simple
+            ///   resource).
+            /// </summary>
+            /// <param name="endpoint">The whole endpoint url</param>
+            /// <param name="requestArgs">The arguments for the query string</param>
+            /// <param name="authorization">The authorization to use</param>
+            /// <typeparam name="AuthType">The authentication type</typeparam>
+            /// <typeparam name="ResponseType">The type of the response</typeparam>
+            /// <returns>The operation result</returns>
+            public static Task<ResponseType> OperationTo<AuthType, ResponseType>(
+                string endpoint, AuthType authorization, Dictionary<string, string> requestArgs
+            ) where AuthType : Authorization {
+                return DoOperation(endpoint, authorization, requestArgs, Deserialize<ResponseType>);
             }
         }
     }
