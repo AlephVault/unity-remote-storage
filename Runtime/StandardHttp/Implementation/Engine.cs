@@ -1,11 +1,12 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
-using System.Web;
 using AlephVault.Unity.RemoteStorage.StandardHttp.Types;
 using Newtonsoft.Json.Linq;
 using UnityEngine.Networking;
+using Authorization = AlephVault.Unity.RemoteStorage.StandardHttp.Types.Authorization;
 
 
 namespace AlephVault.Unity.RemoteStorage.StandardHttp
@@ -254,7 +255,7 @@ namespace AlephVault.Unity.RemoteStorage.StandardHttp
                 {
                     string args = string.Join("&",
                         from arg in requestArgs
-                        select $"{HttpUtility.UrlEncode(arg.Key)}={HttpUtility.UrlEncode(arg.Value.ToString())}"
+                        select $"{WebUtility.UrlEncode(arg.Key)}={WebUtility.UrlEncode(arg.Value.ToString())}"
                     );
                     url += $"?{args}";
                 }
@@ -298,7 +299,7 @@ namespace AlephVault.Unity.RemoteStorage.StandardHttp
                 {
                     string args = string.Join("&",
                         from arg in requestArgs
-                        select $"{HttpUtility.UrlEncode(arg.Key)}={HttpUtility.UrlEncode(arg.Value.ToString())}"
+                        select $"{WebUtility.UrlEncode(arg.Key)}={WebUtility.UrlEncode(arg.Value.ToString())}"
                     );
                     url += $"?{args}";
                 }
